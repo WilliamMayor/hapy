@@ -8,6 +8,6 @@ install:
 - pip install -r requirements.txt --use-mirrors
 - pip install .
 - wget http://builds.archive.org:8080/maven2/org/archive/heritrix/heritrix/3.1.1/heritrix-3.1.1-dist.tar.gz
-- tar xzf heritrix-3.1.1-dist.tar.gz
+- tar xvzf heritrix-3.1.1-dist.tar.gz
 - heritrix-3.1.1-dist/bin/heritrix -a admin:admin
 script: nosetests
