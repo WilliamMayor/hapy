@@ -1,3 +1,6 @@
+import os
+import tempfile
+
 from pkg_resources import resource_string
 from nose.tools import assert_equals, assert_in, assert_not_in
 
@@ -64,3 +67,15 @@ def test_execute_script():
     raw, html = h.execute_script('hapy_test_execute_script', 'groovy', script)
     assert_equals('hapy_test_execute_script', raw)
     assert_equals('hapy_test_execute_script', html)
+
+
+def test_add_job_directory():
+    tdir = tempfile.mkdtemp()
+    cxml = resource_string(__name__, 'assets/readme.cxml')
+    with open(os.path.join(tdir, 'crawler-beans.cxml'), 'w') as fd:
+        fd.write(cxml)
+    h.add_job_directory(tdir)
+    after = h.get_jobs()
+    names = [j['shortName'] for j in after]
+    assert_in(os.path.basename(tdir), names)
+    jobs.append(os.path.basename(tdir))

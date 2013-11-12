@@ -70,7 +70,13 @@ class Hapy:
         )
 
     def add_job_directory(self, path):
-        pass
+        self.__http_post(
+            url=self.base_url,
+            data=dict(
+                action='add',
+                addpath=path
+            )
+        )
 
     def build_job(self, name):
         pass
