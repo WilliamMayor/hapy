@@ -38,7 +38,7 @@
 # http://java.sun.com/javase/6/docs/api/java/util/Properties.html#load%28java.io.Reader%29
 
 metadata.operatorContactUrl=http://github.com/WilliamMayor/hapy
-metadata.jobName=hapy_test_crawl_readme
+metadata.jobName=hapy_test_crawl_ucl
 metadata.description=Crawl used in testing hapy, don't use in real life.
 
 ##..more?..##
@@ -75,9 +75,9 @@ https://raw.github.com/WilliamMayor/hapy/master/README.md
   <!-- <property name="queuePrecedencePolicy">
         <bean class="org.archive.crawler.frontier.precedence.BaseQueuePrecedencePolicy" />
        </property> -->
-  <property name="snoozeLongMs" value="0" />
-  <property name="retryDelaySeconds" value="0" />
-  <property name="maxRetries" value="0" />
+  <!-- <property name="snoozeLongMs" value="0" /> -->
+  <!-- <property name="retryDelaySeconds" value="0" /> -->
+  <!-- <property name="maxRetries" value="0" /> -->
   <!-- <property name="recoveryLogEnabled" value="true" /> -->
   <!-- <property name="maxOutlinks" value="6000" /> -->
   <!-- <property name="extractIndependently" value="false" /> -->
@@ -101,7 +101,7 @@ https://raw.github.com/WilliamMayor/hapy/master/README.md
        <property name="operatorContactUrl" value="[see override above]"/>
        <property name="jobName" value="[see override above]"/>
        <property name="description" value="[see override above]"/>
-       <property name="robotsPolicyName" value="obey"/>
+  <!-- <property name="robotsPolicyName" value="obey"/> -->
   <!-- <property name="operator" value=""/> -->
   <!-- <property name="operatorFrom" value=""/> -->
   <!-- <property name="organization" value=""/> -->

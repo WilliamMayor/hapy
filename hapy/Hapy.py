@@ -1,3 +1,5 @@
+import os
+
 from pkg_resources import resource_string
 from xml.etree import ElementTree
 
@@ -43,6 +45,7 @@ class Hapy:
             verify=not self.insecure,
             allow_redirects=False
         )
+        self.lastresponse = r
         if r.status_code not in [200, 303, 307]:
             raise HapyException(r)
         return r
@@ -54,9 +57,21 @@ class Hapy:
             auth=self.auth,
             verify=not self.insecure
         )
+        self.lastresponse = r
         if r.status_code != 200:
-            print r.request.headers
-            print r.headers
+            raise HapyException(r)
+        return r
+
+    def __http_put(self, url, data):
+        r = requests.put(
+            url=url,
+            data=data,
+            headers=HEADERS,
+            auth=self.auth,
+            verify=not self.insecure
+        )
+        self.lastresponse = r
+        if r.status_code != 200:
             raise HapyException(r)
         return r
 
@@ -79,10 +94,20 @@ class Hapy:
         )
 
     def build_job(self, name):
-        pass
+        self.__http_post(
+            url='%s/job/%s' % (self.base_url, name),
+            data=dict(
+                action='build'
+            )
+        )
 
     def launch_job(self, name):
-        pass
+        self.__http_post(
+            url='%s/job/%s' % (self.base_url, name),
+            data=dict(
+                action='launch'
+            )
+        )
 
     def rescan_job_directory(self):
         self.__http_post(
@@ -93,22 +118,53 @@ class Hapy:
         )
 
     def pause_job(self, name):
-        pass
+        self.__http_post(
+            url='%s/job/%s' % (self.base_url, name),
+            data=dict(
+                action='pause'
+            )
+        )
 
     def unpause_job(self, name):
-        pass
+        self.__http_post(
+            url='%s/job/%s' % (self.base_url, name),
+            data=dict(
+                action='unpause'
+            )
+        )
 
     def terminate_job(self, name):
-        pass
+        self.__http_post(
+            url='%s/job/%s' % (self.base_url, name),
+            data=dict(
+                action='terminate'
+            )
+        )
 
     def teardown_job(self, name):
-        pass
+        self.__http_post(
+            url='%s/job/%s' % (self.base_url, name),
+            data=dict(
+                action='teardown'
+            )
+        )
 
-    def copy_job(self, src_name, dest_name):
-        pass
+    def copy_job(self, src_name, dest_name, as_profile=False):
+        data = dict(copyTo=dest_name)
+        if as_profile:
+            data['asProfile'] = 'on'
+        self.__http_post(
+            url='%s/job/%s' % (self.base_url, src_name),
+            data=data
+        )
 
     def checkpoint_job(self, name):
-        pass
+        self.__http_post(
+            url='%s/job/%s' % (self.base_url, name),
+            data=dict(
+                action='checkpoint'
+            )
+        )
 
     def execute_script(self, name, engine, script):
         r = self.__http_post(
@@ -128,17 +184,64 @@ class Hapy:
         return raw, html
 
     def submit_configuration(self, name, cxml):
-        pass
+        self.__http_put(
+            url='%s/job/%s/jobdir/crawler-beans.cxml' % (self.base_url, name),
+            data=cxml
+        )
+
+    # End of documented API calls, here are some useful extras
+
+    def __tree_to_dict(self, tree, root=True):
+        if len(tree) == 0:
+            return tree.tag, tree.text
+        d = {}
+        for child in tree:
+            tag, contents = self.__tree_to_dict(child, root=False)
+            try:
+                try:
+                    d[tag].append(contents)
+                except AttributeError:
+                    d[tag] = [d[tag], contents]
+            except KeyError:
+                d[tag] = contents
+        if root:
+            return d
+        return tree.tag, d
+
+    def get_info(self):
+        r = self.__http_get(self.base_url)
+        return self.__tree_to_dict(ElementTree.fromstring(r.content))
+
+    def get_job_info(self, name):
+        r = self.__http_get('%s/job/%s' % (self.base_url, name))
+        return self.__tree_to_dict(ElementTree.fromstring(r.content))
+
+    def get_job_configuration(self, name):
+        r = self.__http_get(
+            url='%s/job/%s/jobdir/crawler-beans.cxml' % (self.base_url, name)
+        )
+        return r.content
 
     def delete_job(self, name):
         script = resource_string(__name__, 'scripts/delete_job.groovy')
         self.execute_script(name, 'groovy', script)
+        info = self.get_info()
+        jdir = info['jobsDir']
+        jobpath = os.path.join(jdir, '%s.jobpath' % name)
+        if os.path.isfile(jobpath):
+            os.remove(jobpath)
         self.rescan_job_directory()
 
     def get_jobs(self):
-        r = self.__http_get(self.base_url)
-        tree = ElementTree.fromstring(r.content)
-        jobs = []
-        for job in tree.find('jobs').findall('value'):
-            jobs.append({tag.tag: tag.text for tag in list(job)})
-        return jobs
+        info = self.get_info()
+        value = info['jobs']['value']
+        if isinstance(value, list):
+            return value
+        return [value]
+
+    def get_job_status(self, name):
+        info = self.get_job_info(name)
+        try:
+            return info['crawlControllerState']
+        except:
+            return info['statusDescription']
