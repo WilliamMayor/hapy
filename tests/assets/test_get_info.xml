@@ -1,0 +1,38 @@
+<?xml version="1.0" standalone='yes'?>
+
+<engine>
+  <heritrixVersion>3.1.1</heritrixVersion>
+  <jobsDir>/usr/local/heritrix-3.1.1/jobs</jobsDir>
+  <jobsDirUrl>https://example.com/engine/jobsdir/</jobsDirUrl>
+  <availableActions>
+    <value>rescan</value>
+    <value>add</value>
+    <value>create</value>
+  </availableActions>
+  <heapReport>
+    <usedBytes>101455216</usedBytes>
+    <totalBytes>151158784</totalBytes>
+    <maxBytes>259522560</maxBytes>
+  </heapReport>
+  <jobs>
+    <value>
+      <shortName>test</shortName>
+      <url>https://example.com/engine/job/test</url>
+      <isProfile>false</isProfile>
+      <launchCount>7</launchCount>
+      <lastLaunch>2013-11-11T16:14:29.153Z</lastLaunch>
+      <primaryConfig>/usr/local/heritrix-3.1.1/jobs/test/crawler-beans.cxml</primaryConfig>
+      <primaryConfigUrl>https://example.com/engine/job/test/jobdir/crawler-beans.cxml</primaryConfigUrl>
+    </value>
+    <value>
+      <shortName>test2</shortName>
+      <url>https://example.com/engine/job/test2</url>
+      <isProfile>false</isProfile>
+      <launchCount>0</launchCount>
+      <lastLaunch/>
+      <primaryConfig>/usr/local/heritrix-3.1.1/jobs/test2/crawler-beans.cxml</primaryConfig>
+      <primaryConfigUrl>https://example.com/engine/job/test2/jobdir/crawler-beans.cxml</primaryConfigUrl>
+    </value>
+  </jobs>
+</engine>
+

@@ -501,3 +501,79 @@ def test_tree_to_dict_multiple_child():
     )
     d = dict(root=dict(child=['something', 'something else']))
     assert_equals(d, h._Hapy__tree_to_dict(text))
+
+
+@patch('hapy.HapyClasses.requests')
+def test_get_info(mock_requests):
+    r = Mock()
+    r.status_code = 200
+    r.content = resource_string(
+        __name__,
+        'assets/test_get_info.xml'
+    )
+    r.request = Mock()
+    mock_requests.get.return_value = r
+    info = h.get_info()
+    mock_requests.get.assert_called_with(
+        url='https://example.com/engine',
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'}
+    )
+    assert_equals('3.1.1', info['engine']['heritrixVersion'])
+
+
+@patch('hapy.HapyClasses.requests')
+def test_get_job_info(mock_requests):
+    r = Mock()
+    r.status_code = 200
+    r.content = resource_string(
+        __name__,
+        'assets/test_get_job_info.xml'
+    )
+    r.request = Mock()
+    mock_requests.get.return_value = r
+    name = 'test_get_job_info'
+    info = h.get_job_info(name)
+    mock_requests.get.assert_called_with(
+        url='https://example.com/engine/job/%s' % name,
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'}
+    )
+    assert_equals('test_get_job_info', info['job']['shortName'])
+
+
+@patch('hapy.HapyClasses.requests')
+def test_get_job_configuration(mock_requests):
+    name = 'test_get_job_configuration'
+    cxml = resource_string(
+        __name__,
+        'assets/test_get_job_configuration.xml'
+    )
+
+    def side_effect(**kwargs):
+        r = Mock()
+        r.status_code = 200
+        r.request = Mock()
+        url = ('https://example.com/engine/job'
+               '/test_get_info/crawler-beans.xml')
+        if kwargs['url'] == url:
+            r.content = cxml
+            return r
+        xml = resource_string(
+            __name__,
+            'assets/test_get_job_info.xml'
+        )
+        r.content = xml
+        return r
+
+    mock_requests.get.side_effect = side_effect
+    config = h.get_job_configuration(name)
+    mock_requests.get.assert_called_with(
+        url='https://example.com/engine/job/test_get_info/crawler-beans.xml',
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'}
+    )
+    assert_equals(cxml, config)

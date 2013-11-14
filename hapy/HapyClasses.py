@@ -231,8 +231,10 @@ class Hapy:
         return self.__tree_to_dict(ElementTree.fromstring(r.content))
 
     def get_job_configuration(self, name):
+        info = self.get_job_info(name)
+        url = info['job']['primaryConfigUrl']
         r = self.__http_get(
-            url='%s/job/%s/jobdir/crawler-beans.cxml' % (self.base_url, name)
+            url=url
         )
         return r.content
 
