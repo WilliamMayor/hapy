@@ -1,4 +1,7 @@
 from pkg_resources import resource_string
+from xml.etree import ElementTree
+
+import requests
 
 from mock import (
     patch,
@@ -13,16 +16,6 @@ from nose.tools import (
 import hapy
 
 """
-Test get, post, and put respond correctly
-    - differing status codes
-Test auth works as expected
-Test tree_to_dict
-    <root>something</root>
-        root: something
-    <root><child>something</child><root>
-        root: child: something
-    <root><child>something</child><child>something</child><root>
-        root: child: [something, something]
 For each request that requires a response
     - get_info
     - get_job_info
@@ -42,24 +35,35 @@ def setup():
     h = hapy.Hapy(BASE_URL)
 
 
-@patch('hapy.HapyClasses.requests')
-def test_create_job(mock_requests):
-    r = Mock()
-    r.status_code = 303
-    r.request = Mock()
-    mock_requests.post.return_value = r
-    name = 'test_create_job'
-    h.create_job(name)
-    mock_requests.post.assert_called_with(
-        url='https://example.com/engine',
-        data=dict(
-            action='create',
-            createpath=name
-        ),
-        auth=None,
-        verify=False,
-        headers={'accept': 'application/xml'},
-        allow_redirects=False
+def test_auth_nothing():
+    h = hapy.Hapy(BASE_URL)
+    assert_is_none(h.auth)
+
+
+def test_auth_no_password():
+    h = hapy.Hapy(BASE_URL, username='username')
+    assert_is_none(h.auth)
+
+
+def test_auth_no_username():
+    h = hapy.Hapy(BASE_URL, password='password')
+    assert_is_none(h.auth)
+
+
+def test_auth():
+    h = hapy.Hapy(
+        BASE_URL,
+        username='username',
+        password='password'
+    )
+    a = requests.auth.HTTPDigestAuth('username', 'password')
+    assert_equals(
+        a.username,
+        h.auth.username
+    )
+    assert_equals(
+        a.password,
+        h.auth.password
     )
 
 
@@ -91,6 +95,27 @@ def test_put_wrong_code(mock_requests):
     r.request = Mock()
     mock_requests.put.return_value = r
     h._Hapy__http_put('url', data='data')
+
+
+@patch('hapy.HapyClasses.requests')
+def test_create_job(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_create_job'
+    h.create_job(name)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine',
+        data=dict(
+            action='create',
+            createpath=name
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
 
 
 @patch('hapy.HapyClasses.requests')
@@ -456,3 +481,23 @@ def test_submit_configuration(mock_requests):
         verify=False,
         headers={'accept': 'application/xml'}
     )
+
+
+def test_tree_to_dict_leaf():
+    text = ElementTree.fromstring('<root>something</root>')
+    d = dict(root='something')
+    assert_equals(d, h._Hapy__tree_to_dict(text))
+
+
+def test_tree_to_dict_single_child():
+    text = ElementTree.fromstring('<root><child>something</child></root>')
+    d = dict(root=dict(child='something'))
+    assert_equals(d, h._Hapy__tree_to_dict(text))
+
+
+def test_tree_to_dict_multiple_child():
+    text = ElementTree.fromstring(
+        '<root><child>something</child><child>something else</child></root>'
+    )
+    d = dict(root=dict(child=['something', 'something else']))
+    assert_equals(d, h._Hapy__tree_to_dict(text))

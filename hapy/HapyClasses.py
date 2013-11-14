@@ -197,7 +197,7 @@ class Hapy:
 
     def submit_configuration(self, name, cxml):
         info = self.get_job_info(name)
-        url = info['primaryConfigUrl']
+        url = info['job']['primaryConfigUrl']
         self.__http_put(
             url=url,
             data=cxml,
@@ -206,22 +206,21 @@ class Hapy:
 
     # End of documented API calls, here are some useful extras
 
-    def __tree_to_dict(self, tree, root=True):
+    def __tree_to_dict(self, tree):
         if len(tree) == 0:
-            return tree.tag, tree.text
-        d = {}
+            return {tree.tag: tree.text}
+        D = {}
         for child in tree:
-            tag, contents = self.__tree_to_dict(child, root=False)
+            d = self.__tree_to_dict(child)
+            tag = d.keys()[0]
             try:
                 try:
-                    d[tag].append(contents)
+                    D[tag].append(d[tag])
                 except AttributeError:
-                    d[tag] = [d[tag], contents]
+                    D[tag] = [D[tag], d[tag]]
             except KeyError:
-                d[tag] = contents
-        if root:
-            return d
-        return tree.tag, d
+                D[tag] = d[tag]
+        return {tree.tag: D}
 
     def get_info(self):
         r = self.__http_get(self.base_url)
@@ -257,6 +256,6 @@ class Hapy:
     def get_job_status(self, name):
         info = self.get_job_info(name)
         try:
-            return info['crawlControllerState']
+            return info['job']['crawlControllerState']
         except:
-            return info['statusDescription']
+            return info['job']['statusDescription']
