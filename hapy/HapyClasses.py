@@ -29,14 +29,14 @@ class Hapy:
     def __init__(self, base_url, username=None, password=None, insecure=True):
         if base_url.endswith('/'):
             base_url = base_url[:-1]
-        self.base_url = base_url
+        self.base_url = '%s/engine' % base_url
         if None not in [username, password]:
             self.auth = requests.auth.HTTPDigestAuth(username, password)
         else:
             self.auth = None
         self.insecure = insecure
 
-    def __http_post(self, url, data):
+    def __http_post(self, url, data, code=200):
         r = requests.post(
             url=url,
             data=data,
@@ -46,11 +46,11 @@ class Hapy:
             allow_redirects=False
         )
         self.lastresponse = r
-        if r.status_code not in [200, 303, 307]:
+        if r.status_code != code:
             raise HapyException(r)
         return r
 
-    def __http_get(self, url):
+    def __http_get(self, url, code=200):
         r = requests.get(
             url=url,
             headers=HEADERS,
@@ -58,11 +58,11 @@ class Hapy:
             verify=not self.insecure
         )
         self.lastresponse = r
-        if r.status_code != 200:
+        if r.status_code != code:
             raise HapyException(r)
         return r
 
-    def __http_put(self, url, data):
+    def __http_put(self, url, data, code=200):
         r = requests.put(
             url=url,
             data=data,
@@ -71,7 +71,7 @@ class Hapy:
             verify=not self.insecure
         )
         self.lastresponse = r
-        if r.status_code != 200:
+        if r.status_code != code:
             raise HapyException(r)
         return r
 
@@ -81,7 +81,8 @@ class Hapy:
             data=dict(
                 action='create',
                 createpath=name
-            )
+            ),
+            code=303
         )
 
     def add_job_directory(self, path):
@@ -89,8 +90,9 @@ class Hapy:
             url=self.base_url,
             data=dict(
                 action='add',
-                addpath=path
-            )
+                path=path
+            ),
+            code=303
         )
 
     def build_job(self, name):
@@ -98,7 +100,8 @@ class Hapy:
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='build'
-            )
+            ),
+            code=303
         )
 
     def launch_job(self, name):
@@ -106,7 +109,8 @@ class Hapy:
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='launch'
-            )
+            ),
+            code=303
         )
 
     def rescan_job_directory(self):
@@ -114,7 +118,8 @@ class Hapy:
             url=self.base_url,
             data=dict(
                 action='rescan'
-            )
+            ),
+            code=303
         )
 
     def pause_job(self, name):
@@ -122,7 +127,8 @@ class Hapy:
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='pause'
-            )
+            ),
+            code=303
         )
 
     def unpause_job(self, name):
@@ -130,7 +136,8 @@ class Hapy:
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='unpause'
-            )
+            ),
+            code=303
         )
 
     def terminate_job(self, name):
@@ -138,7 +145,8 @@ class Hapy:
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='terminate'
-            )
+            ),
+            code=303
         )
 
     def teardown_job(self, name):
@@ -146,7 +154,8 @@ class Hapy:
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='teardown'
-            )
+            ),
+            code=303
         )
 
     def copy_job(self, src_name, dest_name, as_profile=False):
@@ -155,7 +164,8 @@ class Hapy:
             data['asProfile'] = 'on'
         self.__http_post(
             url='%s/job/%s' % (self.base_url, src_name),
-            data=data
+            data=data,
+            code=303
         )
 
     def checkpoint_job(self, name):
@@ -163,7 +173,8 @@ class Hapy:
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='checkpoint'
-            )
+            ),
+            code=303
         )
 
     def execute_script(self, name, engine, script):
@@ -172,7 +183,8 @@ class Hapy:
             data=dict(
                 engine=engine,
                 script=script
-            )
+            ),
+            code=200
         )
         tree = ElementTree.fromstring(r.content)
         raw = tree.find('rawOutput')
@@ -184,9 +196,12 @@ class Hapy:
         return raw, html
 
     def submit_configuration(self, name, cxml):
+        info = self.get_job_info(name)
+        url = info['primaryConfigUrl']
         self.__http_put(
-            url='%s/job/%s/jobdir/crawler-beans.cxml' % (self.base_url, name),
-            data=cxml
+            url=url,
+            data=cxml,
+            code=200
         )
 
     # End of documented API calls, here are some useful extras

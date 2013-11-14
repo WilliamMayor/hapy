@@ -1,275 +1,458 @@
-import os
-import tempfile
-import time
-
 from pkg_resources import resource_string
+
+from mock import (
+    patch,
+    Mock
+)
 from nose.tools import (
-    with_setup,
-    assert_equals,
-    assert_not_equal,
-    assert_in,
-    assert_not_in
+    raises,
+    assert_is_none,
+    assert_equals
 )
 
 import hapy
 
-BASE_URL = 'https://localhost:8443/engine/'
+"""
+Test get, post, and put respond correctly
+    - differing status codes
+Test auth works as expected
+Test tree_to_dict
+    <root>something</root>
+        root: something
+    <root><child>something</child><root>
+        root: child: something
+    <root><child>something</child><child>something</child><root>
+        root: child: [something, something]
+For each request that requires a response
+    - get_info
+    - get_job_info
+    - get_job_configuration
+    - execute_script
+Create example responses
+    - correct
+    - error
+"""
 
+BASE_URL = 'https://example.com'
 h = None
-jobs = None
 
 
-def setup_func():
-    global h, jobs
-    h = hapy.Hapy(BASE_URL, username='admin', password='admin')
-    jobs = []
+def setup():
+    global h
+    h = hapy.Hapy(BASE_URL)
 
 
-def teardown_func():
-    for job in jobs:
-        try:
-            h.terminate_job(job)
-            h.teardown_job(job)
-        except:
-            pass
-        h.delete_job(job)
-
-
-def create(name, cxml='readme'):
+@patch('hapy.HapyClasses.requests')
+def test_create_job(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_create_job'
     h.create_job(name)
-    cxml = resource_string(__name__, 'assets/%s.cxml' % cxml)
-    h.submit_configuration(name, cxml)
-    jobs.append(name)
-
-
-def until_status(name, status, attempts=5):
-    for _ in xrange(0, attempts):
-        s = h.get_job_status(name)
-        if s == status:
-            return s
-        time.sleep(1)
-    raise Exception('status %s not reached' % status)
-
-
-def assert_not_raises(exception, func, *args, **kwargs):
-    try:
-        func(*args, **kwargs)
-    except exception:
-        assert False
-
-
-@with_setup(setup_func, teardown_func)
-def test_instantiate():
-    hapy.Hapy(BASE_URL)
-    hapy.Hapy(BASE_URL, insecure=False)
-    hapy.Hapy(BASE_URL, username='admin')
-    hapy.Hapy(BASE_URL, password='admin')
-    hapy.Hapy(BASE_URL, username='admin', password='admin')
-
-
-@with_setup(setup_func, teardown_func)
-def test_create():
-    name = 'hapy_test_create'
-    before = h.get_jobs()
-    create(name)
-    after = h.get_jobs()
-    assert_equals(len(before), len(after) - 1)
-    names = [j['shortName'] for j in after]
-    assert_in(name, names)
-
-
-@with_setup(setup_func, teardown_func)
-def test_add_job_directory():
-    tdir = tempfile.mkdtemp()
-    name = os.path.basename(tdir)
-    cxml = resource_string(__name__, 'assets/readme.cxml')
-    with open(os.path.join(tdir, 'crawler-beans.cxml'), 'w') as fd:
-        fd.write(cxml)
-    h.add_job_directory(tdir)
-    after = h.get_jobs()
-    names = [j['shortName'] for j in after]
-    assert_in(name, names)
-    jobs.append(name)
-
-
-@with_setup(setup_func, teardown_func)
-def test_unbuilt():
-    name = 'hapy_test_unbuilt'
-    create(name)
-    assert_not_raises(Exception, until_status, name, 'Unbuilt')
-
-
-@with_setup(setup_func, teardown_func)
-def test_built():
-    name = 'hapy_test_built'
-    create(name)
-    until_status(name, 'Unbuilt')
-    h.build_job(name)
-    assert_not_raises(Exception, until_status, name, 'NASCENT')
-
-
-@with_setup(setup_func, teardown_func)
-def test_rescan():
-    name = 'hapy_test_rescan'
-    h.create_job(name)
-    script = resource_string(hapy.__name__, 'scripts/delete_job.groovy')
-    h.execute_script(name, 'groovy', script)
-    before = h.get_jobs()
-    h.rescan_job_directory()
-    after = h.get_jobs()
-    bnames = [j['shortName'] for j in before]
-    assert_in(name, bnames)
-    anames = [j['shortName'] for j in after]
-    assert_not_in(name, anames)
-
-
-@with_setup(setup_func, teardown_func)
-def test_pause():
-    name = 'hapy_test_pause'
-    create(name, cxml='ucl')
-    until_status(name, 'Unbuilt')
-    h.build_job(name)
-    until_status(name, 'NASCENT')
-    h.launch_job(name)
-    until_status(name, 'PAUSED')
-    h.unpause_job(name)
-    until_status(name, 'RUNNING')
-    time.sleep(1)
-    h.pause_job(name)
-    assert_not_raises(Exception, until_status, name, 'PAUSED')
-
-
-@with_setup(setup_func, teardown_func)
-def test_unpause():
-    name = 'hapy_test_unpause'
-    create(name, cxml='ucl')
-    until_status(name, 'Unbuilt')
-    h.build_job(name)
-    until_status(name, 'NASCENT')
-    h.launch_job(name)
-    until_status(name, 'PAUSED')
-    h.unpause_job(name)
-    assert_not_raises(Exception, until_status, name, 'RUNNING')
-
-
-@with_setup(setup_func, teardown_func)
-def test_terminate():
-    name = 'hapy_test_unpause'
-    create(name, cxml='ucl')
-    until_status(name, 'Unbuilt')
-    h.build_job(name)
-    until_status(name, 'NASCENT')
-    h.launch_job(name)
-    until_status(name, 'PAUSED')
-    h.unpause_job(name)
-    until_status(name, 'RUNNING')
-    time.sleep(1)
-    h.terminate_job(name)
-    assert_not_raises(Exception, until_status, name, 'FINISHED')
-
-
-@with_setup(setup_func, teardown_func)
-def test_teardown():
-    name = 'hapy_test_unpause'
-    create(name, cxml='ucl')
-    until_status(name, 'Unbuilt')
-    h.build_job(name)
-    until_status(name, 'NASCENT')
-    h.launch_job(name)
-    until_status(name, 'PAUSED')
-    h.teardown_job(name)
-    assert_not_raises(Exception, until_status, name, 'Unbuilt')
-
-
-@with_setup(setup_func, teardown_func)
-def test_copy_job():
-    src_name = 'hapy_test_copy_job_src'
-    create(src_name)
-    dest_name = 'hapy_test_copy_job_dest'
-    h.copy_job(src_name, dest_name)
-    names = [j['shortName'] for j in h.get_jobs()]
-    assert_in(dest_name, names)
-    assert_equals(
-        h.get_job_configuration(src_name),
-        h.get_job_configuration(dest_name)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine',
+        data=dict(
+            action='create',
+            createpath=name
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
     )
-    jobs.append(dest_name)
 
 
-@with_setup(setup_func, teardown_func)
-def test_copy_job_as_profile():
-    src_name = 'hapy_test_copy_job_src'
-    create(src_name)
-    dest_name = 'hapy_test_copy_job_dest'
-    h.copy_job(src_name, dest_name, as_profile=True)
-    info = h.get_job_info(dest_name)
-    print info
-    assert_equals('true', info['isProfile'])
-    jobs.append(dest_name)
+@raises(hapy.HapyException)
+@patch('hapy.HapyClasses.requests')
+def test_get_wrong_code(mock_requests):
+    r = Mock()
+    r.status_code = 404
+    r.request = Mock()
+    mock_requests.get.return_value = r
+    h._Hapy__http_get('url')
 
 
-@with_setup(setup_func, teardown_func)
-def test_delete():
-    name = 'hapy_test_delete'
-    h.create_job(name)
-    before = h.get_jobs()
-    h.delete_job(name)
-    after = h.get_jobs()
-    assert_equals(len(before), len(after) + 1)
-    names = [j['shortName'] for j in after]
-    assert_not_in(name, names)
+@raises(hapy.HapyException)
+@patch('hapy.HapyClasses.requests')
+def test_post_wrong_code(mock_requests):
+    r = Mock()
+    r.status_code = 404
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    h._Hapy__http_post('url', data='data')
 
 
-@with_setup(setup_func, teardown_func)
-def test_delete_alternate_job_directory():
-    tdir = tempfile.mkdtemp()
-    name = os.path.basename(tdir)
-    cxml = resource_string(__name__, 'assets/readme.cxml')
-    with open(os.path.join(tdir, 'crawler-beans.cxml'), 'w') as fd:
-        fd.write(cxml)
-    h.add_job_directory(tdir)
-    tree = h.get_info()
-    jdir = tree.find('jobsDir').text
-    assert os.path.isfile(os.path.join(jdir, '%s.jobpath' % name))
-    h.delete_job(name)
-    assert not os.path.isfile(os.path.join(jdir, '%s.jobpath' % name))
+@raises(hapy.HapyException)
+@patch('hapy.HapyClasses.requests')
+def test_put_wrong_code(mock_requests):
+    r = Mock()
+    r.status_code = 404
+    r.request = Mock()
+    mock_requests.put.return_value = r
+    h._Hapy__http_put('url', data='data')
 
 
-@with_setup(setup_func, teardown_func)
-def test_get_jobs():
-    create('hapy_test_get_jobs')
-    names = [j['shortName'] for j in h.get_jobs()]
-    assert_in('hapy_test_get_jobs', names)
+@patch('hapy.HapyClasses.requests')
+def test_add_job_directory(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    path = '/test_add_job_directory'
+    h.add_job_directory(path)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine',
+        data=dict(
+            action='add',
+            path=path
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
 
 
-@with_setup(setup_func, teardown_func)
-def test_execute_script():
-    create('hapy_test_execute_script')
-    script = resource_string(__name__, 'assets/print_jobname.groovy')
-    raw, html = h.execute_script('hapy_test_execute_script', 'groovy', script)
-    assert_equals('hapy_test_execute_script', raw)
-    assert_equals('hapy_test_execute_script', html)
-
-
-@with_setup(setup_func, teardown_func)
-def test_launched():
-    name = 'hapy_test_launched'
-    create(name)
-    until_status(name, 'Unbuilt')
+@patch('hapy.HapyClasses.requests')
+def test_build_job(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_build_job'
     h.build_job(name)
-    until_status(name, 'NASCENT')
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s' % name,
+        data=dict(
+            action='build'
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+
+
+@patch('hapy.HapyClasses.requests')
+def test_launch_job(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_launch_job'
     h.launch_job(name)
-    assert_not_raises(Exception, until_status, name, 'PAUSED')
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s' % name,
+        data=dict(
+            action='launch'
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
 
 
-@with_setup(setup_func, teardown_func)
-def test_submit_configuration():
+@patch('hapy.HapyClasses.requests')
+def test_rescan_job_directory(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    h.rescan_job_directory()
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine',
+        data=dict(
+            action='rescan'
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+
+
+@patch('hapy.HapyClasses.requests')
+def test_pause_job(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_pause_job'
+    h.pause_job(name)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s' % name,
+        data=dict(
+            action='pause'
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+
+
+@patch('hapy.HapyClasses.requests')
+def test_unpause_job(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_unpause_job'
+    h.unpause_job(name)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s' % name,
+        data=dict(
+            action='unpause'
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+
+
+@patch('hapy.HapyClasses.requests')
+def test_terminate_job(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_terminate_job'
+    h.terminate_job(name)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s' % name,
+        data=dict(
+            action='terminate'
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+
+
+@patch('hapy.HapyClasses.requests')
+def test_teardown_job(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_teardown_job'
+    h.teardown_job(name)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s' % name,
+        data=dict(
+            action='teardown'
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+
+
+@patch('hapy.HapyClasses.requests')
+def test_copy_job(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    src_name = 'test_copy_job'
+    dest_name = 'test_copy_job_copy'
+    h.copy_job(src_name, dest_name)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s' % src_name,
+        data=dict(
+            copyTo=dest_name
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+
+
+@patch('hapy.HapyClasses.requests')
+def test_copy_job_as_profile(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    src_name = 'test_copy_job'
+    dest_name = 'test_copy_job_copy'
+    h.copy_job(src_name, dest_name, as_profile=True)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s' % src_name,
+        data=dict(
+            copyTo=dest_name,
+            asProfile='on'
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+
+
+@patch('hapy.HapyClasses.requests')
+def test_checkpoint_job(mock_requests):
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_checkpoint_job'
+    h.checkpoint_job(name)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s' % name,
+        data=dict(
+            action='checkpoint'
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+
+
+@patch('hapy.HapyClasses.requests')
+def test_execute_script(mock_requests):
+    r = Mock()
+    r.status_code = 200
+    r.content = resource_string(
+        __name__,
+        'assets/test_execute_script.xml'
+    )
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_execute_script'
+    engine = 'groovy'
+    script = ''
+    raw, html = h.execute_script(name, engine, script)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s/script' % name,
+        data=dict(
+            engine=engine,
+            script=script
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+    assert_is_none(raw)
+    assert_is_none(html)
+
+
+@patch('hapy.HapyClasses.requests')
+def test_execute_script_raw(mock_requests):
+    r = Mock()
+    r.status_code = 200
+    r.content = resource_string(
+        __name__,
+        'assets/test_execute_script_raw.xml'
+    )
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_execute_script'
+    engine = 'groovy'
+    script = 'rawOut.print("a")'
+    raw, html = h.execute_script(name, engine, script)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s/script' % name,
+        data=dict(
+            engine=engine,
+            script=script
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+    assert_equals("a", raw)
+    assert_is_none(html)
+
+
+@patch('hapy.HapyClasses.requests')
+def test_execute_script_html(mock_requests):
+    r = Mock()
+    r.status_code = 200
+    r.content = resource_string(
+        __name__,
+        'assets/test_execute_script_html.xml'
+    )
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_execute_script'
+    engine = 'groovy'
+    script = 'htmlOut.print("a")'
+    raw, html = h.execute_script(name, engine, script)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s/script' % name,
+        data=dict(
+            engine=engine,
+            script=script
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+    assert_equals("a", html)
+    assert_is_none(raw)
+
+
+@patch('hapy.HapyClasses.requests')
+def test_execute_script_both(mock_requests):
+    r = Mock()
+    r.status_code = 200
+    r.content = resource_string(
+        __name__,
+        'assets/test_execute_script_both.xml'
+    )
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_execute_script'
+    engine = 'groovy'
+    script = 'htmlOut.print("a")\nrawOut.print("b")'
+    raw, html = h.execute_script(name, engine, script)
+    mock_requests.post.assert_called_with(
+        url='https://example.com/engine/job/%s/script' % name,
+        data=dict(
+            engine=engine,
+            script=script
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False
+    )
+    assert_equals("b", raw)
+    assert_equals("a", html)
+
+
+@patch('hapy.HapyClasses.requests')
+def test_submit_configuration(mock_requests):
+    r = Mock()
+    r.status_code = 200
+    r.content = resource_string(
+        __name__,
+        'assets/test_submit_configuration_job_info.xml'
+    )
+    r.request = Mock()
+    mock_requests.get.return_value = r
+    r = Mock()
+    r.status_code = 200
+    r.request = Mock()
+    mock_requests.put.return_value = r
     name = 'test_submit_configuration'
-    h.create_job(name)
-    before = h.get_job_configuration(name)
-    cxml = resource_string(__name__, 'assets/readme.cxml')
-    h.submit_configuration(name, cxml)
-    after = h.get_job_configuration(name)
-    assert_not_equal(before, after)
-    assert_equals(cxml, after)
-    jobs.append(name)
+    h.submit_configuration(name, 'cxml')
+    mock_requests.put.assert_called_with(
+        url=('https://example.com/engine/job/'
+             'test_submit_configuration/jobdir/config.cxml'),
+        data='cxml',
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'}
+    )

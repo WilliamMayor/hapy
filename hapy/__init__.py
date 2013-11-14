@@ -1,2 +1,2 @@
-from Hapy import Hapy
-from Hapy import HapyException
+from HapyClasses import Hapy
+from HapyClasses import HapyException

@@ -1,0 +1,46 @@
+<?xml version="1.0" standalone='yes'?>
+
+<script>
+  <crawlJobShortName>ucl</crawlJobShortName>
+  <crawlJobUrl>https://localhost:8443/engine/job/ucl/</crawlJobUrl>
+  <availableScriptEngines>
+    <value>
+      <engine>beanshell</engine>
+      <language>BeanShell</language>
+    </value>
+    <value>
+      <engine>groovy</engine>
+      <language>Groovy</language>
+    </value>
+    <value>
+      <engine>js</engine>
+      <language>ECMAScript</language>
+    </value>
+  </availableScriptEngines>
+  <availableGlobalVariables>
+    <value>
+      <variable>rawOut</variable>
+      <description>a PrintWriter for arbitrary text output to this page</description>
+    </value>
+    <value>
+      <variable>htmlOut</variable>
+      <description>a PrintWriter for HTML output to this page</description>
+    </value>
+    <value>
+      <variable>job</variable>
+      <description>the current CrawlJob instance</description>
+    </value>
+    <value>
+      <variable>appCtx</variable>
+      <description>current job ApplicationContext, if any</description>
+    </value>
+    <value>
+      <variable>scriptResource</variable>
+      <description>the ScriptResource implementing this page, which offers utility methods</description>
+    </value>
+  </availableGlobalVariables>
+  <linesExecuted>1</linesExecuted>
+  <rawOutput>b</rawOutput>
+  <htmlOutput>a</htmlOutput>
+</script>
+
