@@ -36,7 +36,7 @@ class Hapy:
             self.auth = None
         self.insecure = insecure
 
-    def __http_post(self, url, data, code=200):
+    def _http_post(self, url, data, code=200):
         r = requests.post(
             url=url,
             data=data,
@@ -50,7 +50,7 @@ class Hapy:
             raise HapyException(r)
         return r
 
-    def __http_get(self, url, code=200):
+    def _http_get(self, url, code=200):
         r = requests.get(
             url=url,
             headers=HEADERS,
@@ -62,7 +62,7 @@ class Hapy:
             raise HapyException(r)
         return r
 
-    def __http_put(self, url, data, code=200):
+    def _http_put(self, url, data, code=200):
         r = requests.put(
             url=url,
             data=data,
@@ -76,7 +76,7 @@ class Hapy:
         return r
 
     def create_job(self, name):
-        self.__http_post(
+        self._http_post(
             url=self.base_url,
             data=dict(
                 action='create',
@@ -86,7 +86,7 @@ class Hapy:
         )
 
     def add_job_directory(self, path):
-        self.__http_post(
+        self._http_post(
             url=self.base_url,
             data=dict(
                 action='add',
@@ -96,7 +96,7 @@ class Hapy:
         )
 
     def build_job(self, name):
-        self.__http_post(
+        self._http_post(
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='build'
@@ -105,7 +105,7 @@ class Hapy:
         )
 
     def launch_job(self, name):
-        self.__http_post(
+        self._http_post(
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='launch'
@@ -114,7 +114,7 @@ class Hapy:
         )
 
     def rescan_job_directory(self):
-        self.__http_post(
+        self._http_post(
             url=self.base_url,
             data=dict(
                 action='rescan'
@@ -123,7 +123,7 @@ class Hapy:
         )
 
     def pause_job(self, name):
-        self.__http_post(
+        self._http_post(
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='pause'
@@ -132,7 +132,7 @@ class Hapy:
         )
 
     def unpause_job(self, name):
-        self.__http_post(
+        self._http_post(
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='unpause'
@@ -141,7 +141,7 @@ class Hapy:
         )
 
     def terminate_job(self, name):
-        self.__http_post(
+        self._http_post(
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='terminate'
@@ -150,7 +150,7 @@ class Hapy:
         )
 
     def teardown_job(self, name):
-        self.__http_post(
+        self._http_post(
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='teardown'
@@ -162,14 +162,14 @@ class Hapy:
         data = dict(copyTo=dest_name)
         if as_profile:
             data['asProfile'] = 'on'
-        self.__http_post(
+        self._http_post(
             url='%s/job/%s' % (self.base_url, src_name),
             data=data,
             code=303
         )
 
     def checkpoint_job(self, name):
-        self.__http_post(
+        self._http_post(
             url='%s/job/%s' % (self.base_url, name),
             data=dict(
                 action='checkpoint'
@@ -178,7 +178,7 @@ class Hapy:
         )
 
     def execute_script(self, name, engine, script):
-        r = self.__http_post(
+        r = self._http_post(
             url='%s/job/%s/script' % (self.base_url, name),
             data=dict(
                 engine=engine,
@@ -198,7 +198,7 @@ class Hapy:
     def submit_configuration(self, name, cxml):
         info = self.get_job_info(name)
         url = info['job']['primaryConfigUrl']
-        self.__http_put(
+        self._http_put(
             url=url,
             data=cxml,
             code=200
@@ -223,17 +223,17 @@ class Hapy:
         return {tree.tag: D}
 
     def get_info(self):
-        r = self.__http_get(self.base_url)
+        r = self._http_get(self.base_url)
         return self.__tree_to_dict(ElementTree.fromstring(r.content))
 
     def get_job_info(self, name):
-        r = self.__http_get('%s/job/%s' % (self.base_url, name))
+        r = self._http_get('%s/job/%s' % (self.base_url, name))
         return self.__tree_to_dict(ElementTree.fromstring(r.content))
 
     def get_job_configuration(self, name):
         info = self.get_job_info(name)
         url = info['job']['primaryConfigUrl']
-        r = self.__http_get(
+        r = self._http_get(
             url=url
         )
         return r.content

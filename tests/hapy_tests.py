@@ -69,7 +69,7 @@ def test_get_wrong_code(mock_requests):
     r.status_code = 404
     r.request = Mock()
     mock_requests.get.return_value = r
-    h._Hapy__http_get('url')
+    h._http_get('url')
 
 
 @raises(hapy.HapyException)
@@ -79,7 +79,7 @@ def test_post_wrong_code(mock_requests):
     r.status_code = 404
     r.request = Mock()
     mock_requests.post.return_value = r
-    h._Hapy__http_post('url', data='data')
+    h._http_post('url', data='data')
 
 
 @raises(hapy.HapyException)
@@ -89,7 +89,7 @@ def test_put_wrong_code(mock_requests):
     r.status_code = 404
     r.request = Mock()
     mock_requests.put.return_value = r
-    h._Hapy__http_put('url', data='data')
+    h._http_put('url', data='data')
 
 
 @patch('hapy.hapy.requests')
