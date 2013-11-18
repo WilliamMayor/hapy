@@ -25,6 +25,16 @@
       <primaryConfigUrl>https://localhost:8443/engine/job/test/jobdir/crawler-beans.cxml</primaryConfigUrl>
       <crawlControllerState>NASCENT</crawlControllerState>
     </value>
+    <value>
+      <shortName>test2</shortName>
+      <url>https://localhost:8443/engine/job/test2</url>
+      <isProfile>false</isProfile>
+      <launchCount>0</launchCount>
+      <lastLaunch/>
+      <primaryConfig>/usr/local/heritrix-3.1.1/jobs/test2/crawler-beans.cxml</primaryConfig>
+      <primaryConfigUrl>https://localhost:8443/engine/job/test2/jobdir/crawler-beans.cxml</primaryConfigUrl>
+      <crawlControllerState>NASCENT</crawlControllerState>
+    </value>
   </jobs>
 </engine>
 

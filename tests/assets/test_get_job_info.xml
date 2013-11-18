@@ -1,31 +1,25 @@
 <?xml version="1.0" standalone='yes'?>
 
 <job>
-  <shortName>test_get_job_info</shortName>
-  <crawlControllerState>PAUSED</crawlControllerState>
-  <statusDescription>Active: PAUSED</statusDescription>
+  <shortName>test</shortName>
+  <crawlControllerState>NASCENT</crawlControllerState>
+  <statusDescription>Ready</statusDescription>
   <availableActions>
-    <value>unpause</value>
-    <value>checkpoint</value>
-    <value>terminate</value>
+    <value>launch</value>
     <value>teardown</value>
   </availableActions>
-  <launchCount>8</launchCount>
-  <lastLaunch>2013-11-14T15:33:40.194Z</lastLaunch>
+  <launchCount>0</launchCount>
+  <lastLaunch/>
   <isProfile>false</isProfile>
-  <primaryConfig>/usr/local/heritrix/jobs/test_get_info/ucl.cxml</primaryConfig>
-  <primaryConfigUrl>https://example.com/engine/job/test_get_info/crawler-beans.xml</primaryConfigUrl>
+  <primaryConfig>/usr/local/heritrix-3.1.1/jobs/test/crawler-beans.cxml</primaryConfig>
+  <primaryConfigUrl>https://localhost:8443/engine/job/test/jobdir/crawler-beans.cxml</primaryConfigUrl>
   <jobLogTail>
-    <value>2013-11-14T15:33:38.559Z INFO Job instantiated</value>
-    <value>2013-11-14T15:33:40.194Z INFO Job launched</value>
-    <value>2013-11-14T15:33:41.805Z INFO PREPARING 20131114153341</value>
-    <value>2013-11-14T15:33:41.815Z INFO PAUSED 20131114153341</value>
-    <value>2013-11-14T15:33:47.900Z INFO CHECKPOINTED cp00001-20131114153347</value>
+    <value>2013-11-18T12:33:50.157Z INFO Job instantiated</value>
   </jobLogTail>
   <uriTotalsReport>
     <downloadedUriCount>0</downloadedUriCount>
-    <queuedUriCount>1</queuedUriCount>
-    <totalUriCount>1</totalUriCount>
+    <queuedUriCount>0</queuedUriCount>
+    <totalUriCount>0</totalUriCount>
     <futureUriCount>0</futureUriCount>
   </uriTotalsReport>
   <sizeTotalsReport>
@@ -34,138 +28,118 @@
   </sizeTotalsReport>
   <rateReport>
     <currentDocsPerSecond>0.0</currentDocsPerSecond>
-    <averageDocsPerSecond>0.0</averageDocsPerSecond>
+    <averageDocsPerSecond>NaN</averageDocsPerSecond>
     <currentKiBPerSec>0</currentKiBPerSec>
     <averageKiBPerSec>0</averageKiBPerSec>
   </rateReport>
   <loadReport>
     <busyThreads>0</busyThreads>
-    <totalThreads>25</totalThreads>
-    <congestionRatio>Infinity</congestionRatio>
-    <averageQueueDepth>1</averageQueueDepth>
-    <deepestQueueDepth>1</deepestQueueDepth>
+    <totalThreads>0</totalThreads>
+    <congestionRatio>0.0</congestionRatio>
+    <averageQueueDepth>0</averageQueueDepth>
+    <deepestQueueDepth>-1</deepestQueueDepth>
   </loadReport>
   <elapsedReport>
-    <elapsedMilliseconds>10</elapsedMilliseconds>
-    <elapsedPretty>10ms</elapsedPretty>
+    <elapsedMilliseconds>0</elapsedMilliseconds>
+    <elapsedPretty>0ms</elapsedPretty>
   </elapsedReport>
-  <threadReport>
-    <toeCount>25</toeCount>
-    <steps>
-      <ABOUT_TO_GET_URI>25</ABOUT_TO_GET_URI>
-    </steps>
-    <processors>
-      <noActiveProcessor>25</noActiveProcessor>
-    </processors>
-  </threadReport>
-  <frontierReport>
-    <totalQueues>1</totalQueues>
-    <inProcessQueues>0</inProcessQueues>
-    <readyQueues>0</readyQueues>
-    <snoozedQueues>0</snoozedQueues>
-    <activeQueues>0</activeQueues>
-    <inactiveQueues>1</inactiveQueues>
-    <ineligibleQueues>0</ineligibleQueues>
-    <retiredQueues>0</retiredQueues>
-    <exhaustedQueues>0</exhaustedQueues>
-    <lastReachedState>PAUSE</lastReachedState>
-  </frontierReport>
+  <threadReport/>
+  <frontierReport/>
   <heapReport>
-    <usedBytes>100235936</usedBytes>
+    <usedBytes>108797984</usedBytes>
     <totalBytes>151158784</totalBytes>
     <maxBytes>259522560</maxBytes>
   </heapReport>
-  <crawlLogTail></crawlLogTail>
   <configFiles>
     <value>
       <key>acceptSurts.surtsDumpFile</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/surts.dump</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/surts.dump</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/surts.dump</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/surts.dump</url>
     </value>
     <value>
       <key>loggerModule.crawlLogPath</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/logs/crawl.log</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/logs/crawl.log</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/logs/crawl.log</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/logs/crawl.log</url>
     </value>
     <value>
       <key>actionDirectory.actionDir</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/action</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/action</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/action</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/action</url>
     </value>
     <value>
       <key>loggerModule.path</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/logs</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/logs</url>
-    </value>
-    <value>
-      <key>org.archive.modules.deciderules.surt.SurtPrefixedDecideRule#b48cf0b.surtsDumpFile</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/negative-surts.dump</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/negative-surts.dump</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/logs</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/logs</url>
     </value>
     <value>
       <key>loggerModule.nonfatalErrorsLogPath</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/logs/nonfatal-errors.log</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/logs/nonfatal-errors.log</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/logs/nonfatal-errors.log</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/logs/nonfatal-errors.log</url>
     </value>
     <value>
       <key>statisticsTracker.reportsDir</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/reports</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/reports</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/reports</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/reports</url>
     </value>
     <value>
       <key>warcWriter.storePaths[0]</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/warcs</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/warcs</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/warcs</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/warcs</url>
     </value>
     <value>
       <key>checkpointService.checkpointsDir</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/checkpoints</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/checkpoints</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/checkpoints</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/checkpoints</url>
     </value>
     <value>
       <key>warcWriter.defaultStorePaths[0]</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/warcs</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/warcs</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/warcs</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/warcs</url>
     </value>
     <value>
       <key>actionDirectory.doneDir</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/actions-done</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/actions-done</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/actions-done</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/actions-done</url>
     </value>
     <value>
       <key>crawlController.scratchDir</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/scratch</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/scratch</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/scratch</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/scratch</url>
     </value>
     <value>
       <key>warcWriter.directory</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D</url>
     </value>
     <value>
       <key>loggerModule.uriErrorsLogPath</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/logs/uri-errors.log</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/logs/uri-errors.log</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/logs/uri-errors.log</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/logs/uri-errors.log</url>
     </value>
     <value>
       <key>bdb.dir</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/state</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/state</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/state</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/state</url>
     </value>
     <value>
       <key>loggerModule.progressLogPath</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/logs/progress-statistics.log</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/logs/progress-statistics.log</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/logs/progress-statistics.log</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/logs/progress-statistics.log</url>
+    </value>
+    <value>
+      <key>org.archive.modules.deciderules.surt.SurtPrefixedDecideRule#75da0779.surtsDumpFile</key>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/negative-surts.dump</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/negative-surts.dump</url>
     </value>
     <value>
       <key>loggerModule.alertsLogPath</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/logs/alerts.log</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/logs/alerts.log</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/logs/alerts.log</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/logs/alerts.log</url>
     </value>
     <value>
       <key>loggerModule.runtimeErrorsLogPath</key>
-      <path>/usr/local/heritrix/jobs/test_get_info/20131114153341/logs/runtime-errors.log</path>
-      <url>https://localhost:8443/engine/job/ucl/jobdir/20131114153341/logs/runtime-errors.log</url>
+      <path>/usr/local/heritrix-3.1.1/jobs/test/${launchId}/logs/runtime-errors.log</path>
+      <url>https://localhost:8443/engine/job/test/jobdir/$%7BlaunchId%7D/logs/runtime-errors.log</url>
     </value>
   </configFiles>
 </job>

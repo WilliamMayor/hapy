@@ -1,8 +1,8 @@
 <?xml version="1.0" standalone='yes'?>
 
 <script>
-  <crawlJobShortName>ucl</crawlJobShortName>
-  <crawlJobUrl>https://localhost:8443/engine/job/ucl/</crawlJobUrl>
+  <crawlJobShortName>test</crawlJobShortName>
+  <crawlJobUrl>https://localhost:8443/engine/job/test/</crawlJobUrl>
   <availableScriptEngines>
     <value>
       <engine>beanshell</engine>
@@ -40,6 +40,6 @@
     </value>
   </availableGlobalVariables>
   <linesExecuted>1</linesExecuted>
-  <htmlOutput>a</htmlOutput>
+  <htmlOutput>html</htmlOutput>
 </script>
 

@@ -247,17 +247,3 @@ class Hapy:
         if os.path.isfile(jobpath):
             os.remove(jobpath)
         self.rescan_job_directory()
-
-    def get_jobs(self):
-        info = self.get_info()
-        value = info['jobs']['value']
-        if isinstance(value, list):
-            return value
-        return [value]
-
-    def get_job_status(self, name):
-        info = self.get_job_info(name)
-        try:
-            return info['job']['crawlControllerState']
-        except:
-            return info['job']['statusDescription']

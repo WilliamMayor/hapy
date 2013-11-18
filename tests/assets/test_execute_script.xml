@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone='yes' ?>
  <script>
-<crawlJobShortName>ucl</crawlJobShortName>
-<crawlJobUrl>https://example.com/engine/job/test_execute_script/</crawlJobUrl>
+<crawlJobShortName>test</crawlJobShortName>
+<crawlJobUrl>https://localhost:8443/engine/job/test/</crawlJobUrl>
  <availableScriptEngines>
  <value>
 <engine>beanshell</engine>
@@ -38,5 +38,5 @@
 <description>the ScriptResource implementing this page, which offers utility methods</description>
  </value>
  </availableGlobalVariables>
-<exception>javax.script.ScriptException: javax.script.ScriptException: java.lang.NullPointerException</exception>
+<linesExecuted>1</linesExecuted>
  </script>
