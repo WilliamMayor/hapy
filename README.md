@@ -57,7 +57,7 @@ There are some extra functions that wrap the undocumented API:
 
 The functions `get_info` and `get_job_info` return a python `dict` that contains the XML returned by Heritrix. `get_job_configuration` returns a string containing the CXML configuration.
 
-For example, here's how to get the launch count of a job name 'test':
+For example, here's how to get the launch count of a job named 'test':
 
     import hapy
 
@@ -80,9 +80,9 @@ Here's a quick script that builds, launches and unpauses a job using information
     def wait_for(h, job_name, func_name):
         print 'waiting for', func_name
         info = h.get_job_info(job_name)
-        while func_name not in info['job']['availableActions']:
-            print '    got ', info['job']['availableActions']
+        while func_name not in info['job']['availableActions']['value']:
             time.sleep(1)
+            info = h.get_job_info(job_name)
 
     name = sys.argv[1]
     config_path = sys.argv[2]
@@ -92,8 +92,8 @@ Here's a quick script that builds, launches and unpauses a job using information
     h.create_job(name)
     h.submit_configuration(name, config)
     wait_for(h, name, 'build')
-    h.build(name)
+    h.build_job(name)
     wait_for(h, name, 'launch')
-    h.launch(name)
+    h.launch_job(name)
     wait_for(h, name, 'unpause')
-    h.unpause(name)
+    h.unpause_job(name)
