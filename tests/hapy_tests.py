@@ -63,7 +63,7 @@ def test_auth():
 
 
 @raises(hapy.HapyException)
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_get_wrong_code(mock_requests):
     r = Mock()
     r.status_code = 404
@@ -73,7 +73,7 @@ def test_get_wrong_code(mock_requests):
 
 
 @raises(hapy.HapyException)
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_post_wrong_code(mock_requests):
     r = Mock()
     r.status_code = 404
@@ -83,7 +83,7 @@ def test_post_wrong_code(mock_requests):
 
 
 @raises(hapy.HapyException)
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_put_wrong_code(mock_requests):
     r = Mock()
     r.status_code = 404
@@ -92,7 +92,7 @@ def test_put_wrong_code(mock_requests):
     h._Hapy__http_put('url', data='data')
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_create_job(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -113,7 +113,7 @@ def test_create_job(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_add_job_directory(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -134,7 +134,7 @@ def test_add_job_directory(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_build_job(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -154,7 +154,7 @@ def test_build_job(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_launch_job(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -174,7 +174,7 @@ def test_launch_job(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_rescan_job_directory(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -193,7 +193,7 @@ def test_rescan_job_directory(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_pause_job(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -213,7 +213,7 @@ def test_pause_job(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_unpause_job(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -233,7 +233,7 @@ def test_unpause_job(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_terminate_job(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -253,7 +253,7 @@ def test_terminate_job(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_teardown_job(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -273,7 +273,7 @@ def test_teardown_job(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_copy_job(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -294,7 +294,7 @@ def test_copy_job(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_copy_job_as_profile(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -316,7 +316,7 @@ def test_copy_job_as_profile(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_checkpoint_job(mock_requests):
     r = Mock()
     r.status_code = 303
@@ -336,7 +336,7 @@ def test_checkpoint_job(mock_requests):
     )
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_execute_script(mock_requests):
     r = Mock()
     r.status_code = 200
@@ -365,7 +365,7 @@ def test_execute_script(mock_requests):
     assert_is_none(html)
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_execute_script_raw(mock_requests):
     r = Mock()
     r.status_code = 200
@@ -394,7 +394,7 @@ def test_execute_script_raw(mock_requests):
     assert_is_none(html)
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_execute_script_html(mock_requests):
     r = Mock()
     r.status_code = 200
@@ -423,7 +423,7 @@ def test_execute_script_html(mock_requests):
     assert_is_none(raw)
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_execute_script_both(mock_requests):
     r = Mock()
     r.status_code = 200
@@ -452,7 +452,7 @@ def test_execute_script_both(mock_requests):
     assert_equals("html", html)
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_submit_configuration(mock_requests):
     r = Mock()
     r.status_code = 200
@@ -498,7 +498,7 @@ def test_tree_to_dict_multiple_child():
     assert_equals(d, h._Hapy__tree_to_dict(text))
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_get_info(mock_requests):
     r = Mock()
     r.status_code = 200
@@ -518,7 +518,7 @@ def test_get_info(mock_requests):
     assert_equals('3.1.1', info['engine']['heritrixVersion'])
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_get_job_info(mock_requests):
     r = Mock()
     r.status_code = 200
@@ -539,7 +539,7 @@ def test_get_job_info(mock_requests):
     assert_equals('test', info['job']['shortName'])
 
 
-@patch('hapy.HapyClasses.requests')
+@patch('hapy.hapy.requests')
 def test_get_job_configuration(mock_requests):
     name = 'test_get_job_configuration'
     cxml = resource_string(
