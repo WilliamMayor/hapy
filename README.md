@@ -62,7 +62,7 @@ For example, here's how to get the launch count of a job name 'test':
     import hapy
 
     try:
-        h = hapy.Hapy('https://localhost:8443')
+        h = hapy.Hapy('https://localhost:8443', username='admin', password='admin')
         info = h.get_job_info('test')
         launch_count = int(info['job']['launchCount'])
         print 'test has been launched %d time(s)' % launch_count
@@ -78,15 +78,17 @@ Here's a quick script that builds, launches and unpauses a job using information
     import hapy
 
     def wait_for(h, job_name, func_name):
-        while func_name not in h.get_job_info(job_name)['job']['availableActions']:
+        print 'waiting for', func_name
+        info = h.get_job_info(job_name)
+        while func_name not in info['job']['availableActions']:
+            print '    got ', info['job']['availableActions']
             time.sleep(1)
 
-    base_url = sys.argv[1]
-    name = sys.argv[2]
-    config_path = sys.argv[3]
+    name = sys.argv[1]
+    config_path = sys.argv[2]
     with open(config_path, 'r') as fd:
         config = fd.read()
-    h = hapy.Hapy(base_url)
+    h = hapy.Hapy('https://localhost:8443', username='admin', password='admin')
     h.create_job(name)
     h.submit_configuration(name, config)
     wait_for(h, name, 'build')
