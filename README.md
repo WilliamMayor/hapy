@@ -53,7 +53,7 @@ There are some extra functions that wrap the undocumented API:
     h.get_info()
     h.get_job_info(name)
     h.get_job_configuration(name)
-    h.delete_job(name)
+    h.delete_job(name) (careful with this one, it's not fully tested)
 
 The functions `get_info` and `get_job_info` return a python `dict` that contains the XML returned by Heritrix. `get_job_configuration` returns a string containing the CXML configuration.
 
@@ -95,4 +95,3 @@ Here's a quick script that builds, launches and unpauses a job using information
     h.launch(name)
     wait_for(h, name, 'unpause')
     h.unpause(name)
-    
