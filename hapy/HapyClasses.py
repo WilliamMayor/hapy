@@ -242,7 +242,7 @@ class Hapy:
         script = resource_string(__name__, 'scripts/delete_job.groovy')
         self.execute_script(name, 'groovy', script)
         info = self.get_info()
-        jdir = info['jobsDir']
+        jdir = info['engine']['jobsDir']
         jobpath = os.path.join(jdir, '%s.jobpath' % name)
         if os.path.isfile(jobpath):
             os.remove(jobpath)
