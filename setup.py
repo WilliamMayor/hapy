@@ -13,7 +13,7 @@ config = {
     'install_requires': ['nose', 'requests'],
     'packages': ['hapy'],
     'scripts': [],
-    'name': 'hapy',
+    'name': 'hapy-heritrix',
     'package_data': {
         'hapy': ['scripts/delete_job.groovy']
     },
