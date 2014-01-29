@@ -9,7 +9,7 @@ config = {
     'url': 'https://github.com/WilliamMayor/hapy',
     'download_url': 'https://github.com/WilliamMayor/hapy',
     'author_email': 'w.mayor@ucl.ac.uk',
-    'version': '0.1',
+    'version': '0.1.1',
     'install_requires': ['nose', 'requests'],
     'packages': ['hapy'],
     'scripts': [],
