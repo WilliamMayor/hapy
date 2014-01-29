@@ -26,7 +26,7 @@ class HapyException(Exception):
 
 class Hapy:
 
-    def __init__(self, base_url, username=None, password=None, insecure=True):
+    def __init__(self, base_url, username=None, password=None, insecure=True, timeout=None):
         if base_url.endswith('/'):
             base_url = base_url[:-1]
         self.base_url = '%s/engine' % base_url
@@ -35,6 +35,7 @@ class Hapy:
         else:
             self.auth = None
         self.insecure = insecure
+        self.timeout = timeout
 
     def _http_post(self, url, data, code=200):
         r = requests.post(
@@ -43,7 +44,8 @@ class Hapy:
             headers=HEADERS,
             auth=self.auth,
             verify=not self.insecure,
-            allow_redirects=False
+            allow_redirects=False,
+            timeout=self.timeout
         )
         self.lastresponse = r
         if r.status_code != code:
@@ -55,7 +57,8 @@ class Hapy:
             url=url,
             headers=HEADERS,
             auth=self.auth,
-            verify=not self.insecure
+            verify=not self.insecure,
+            timeout=self.timeout
         )
         self.lastresponse = r
         if r.status_code != code:
@@ -68,7 +71,8 @@ class Hapy:
             data=data,
             headers=HEADERS,
             auth=self.auth,
-            verify=not self.insecure
+            verify=not self.insecure,
+            timeout=self.timeout
         )
         self.lastresponse = r
         if r.status_code != code:

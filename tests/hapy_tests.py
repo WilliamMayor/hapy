@@ -109,7 +109,8 @@ def test_create_job(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -130,7 +131,8 @@ def test_add_job_directory(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -150,7 +152,30 @@ def test_build_job(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
+    )
+
+
+@patch('hapy.hapy.requests')
+def test_supply_timeout(mock_requests):
+    h = hapy.Hapy(BASE_URL, timeout=0.005)
+    r = Mock()
+    r.status_code = 303
+    r.request = Mock()
+    mock_requests.post.return_value = r
+    name = 'test_build_job'
+    h.build_job(name)
+    mock_requests.post.assert_called_with(
+        url='https://localhost:8443/engine/job/%s' % name,
+        data=dict(
+            action='build'
+        ),
+        auth=None,
+        verify=False,
+        headers={'accept': 'application/xml'},
+        allow_redirects=False,
+        timeout=0.005
     )
 
 
@@ -170,7 +195,8 @@ def test_launch_job(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -189,7 +215,8 @@ def test_rescan_job_directory(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -209,7 +236,8 @@ def test_pause_job(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -229,7 +257,8 @@ def test_unpause_job(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -249,7 +278,8 @@ def test_terminate_job(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -269,7 +299,8 @@ def test_teardown_job(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -290,7 +321,8 @@ def test_copy_job(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -312,7 +344,8 @@ def test_copy_job_as_profile(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -332,7 +365,8 @@ def test_checkpoint_job(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
 
 
@@ -359,7 +393,8 @@ def test_execute_script(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
     assert_is_none(raw)
     assert_is_none(html)
@@ -388,7 +423,8 @@ def test_execute_script_raw(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
     assert_equals("raw", raw)
     assert_is_none(html)
@@ -417,7 +453,8 @@ def test_execute_script_html(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
     assert_equals("html", html)
     assert_is_none(raw)
@@ -446,7 +483,8 @@ def test_execute_script_both(mock_requests):
         auth=None,
         verify=False,
         headers={'accept': 'application/xml'},
-        allow_redirects=False
+        allow_redirects=False,
+        timeout=None
     )
     assert_equals("raw", raw)
     assert_equals("html", html)
@@ -474,7 +512,8 @@ def test_submit_configuration(mock_requests):
         data='cxml',
         auth=None,
         verify=False,
-        headers={'accept': 'application/xml'}
+        headers={'accept': 'application/xml'},
+        timeout=None
     )
 
 
@@ -513,7 +552,8 @@ def test_get_info(mock_requests):
         url='https://localhost:8443/engine',
         auth=None,
         verify=False,
-        headers={'accept': 'application/xml'}
+        headers={'accept': 'application/xml'},
+        timeout=None
     )
     assert_equals('3.1.1', info['engine']['heritrixVersion'])
 
@@ -534,7 +574,8 @@ def test_get_job_info(mock_requests):
         url='https://localhost:8443/engine/job/%s' % name,
         auth=None,
         verify=False,
-        headers={'accept': 'application/xml'}
+        headers={'accept': 'application/xml'},
+        timeout=None
     )
     assert_equals('test', info['job']['shortName'])
 
@@ -564,6 +605,7 @@ def test_get_job_configuration(mock_requests):
         url='https://localhost:8443/engine/job/test/jobdir/crawler-beans.cxml',
         auth=None,
         verify=False,
-        headers={'accept': 'application/xml'}
+        headers={'accept': 'application/xml'},
+        timeout=None
     )
     assert_equals(cxml, config)
